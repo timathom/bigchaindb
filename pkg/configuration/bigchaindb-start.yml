@@ -28,3 +28,4 @@
   roles:
     - tendermint
     - bigchaindb
+    - bigchaindb-driver # Add Python driver to install
