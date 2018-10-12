@@ -147,27 +147,6 @@ def test_post_transaction_invalid_mode(b):
         b.write_transaction(tx, 'nope')
 
 
-@pytest.mark.skip
-@pytest.mark.bdb
-def test_validator_updates(b, validator_pub_key):
-    from bigchaindb.backend import query
-    from bigchaindb.backend.query import VALIDATOR_UPDATE_ID
-
-    # create a validator update object
-    validator = {'pub_key': {'type': 'ed25519',
-                             'data': validator_pub_key},
-                 'power': 10}
-    validator_update = {'validator': validator,
-                        'update_id': VALIDATOR_UPDATE_ID}
-    query.store_validator_update(b.connection, validator_update)
-
-    updates = b.approved_updates()
-    assert updates == validator_update['validator']
-
-    b.delete_validator_update()
-    assert not b.approved_updates()
-
-
 @pytest.mark.bdb
 def test_update_utxoset(b, signed_create_tx, signed_transfer_tx, db_context):
     mongo_client = MongoClient(host=db_context.host, port=db_context.port)
@@ -471,3 +450,36 @@ def test_migrate_abci_chain_generates_new_chains(b, chain, block_height,
     b.migrate_abci_chain()
     latest_chain = b.get_latest_abci_chain()
     assert latest_chain == expected
+
+
+@pytest.mark.bdb
+def test_get_spent_key_order(b, user_pk, user_sk, user2_pk, user2_sk):
+    from bigchaindb import backend
+    from bigchaindb.models import Transaction
+    from bigchaindb.common.crypto import generate_key_pair
+    from bigchaindb.common.exceptions import DoubleSpend
+
+    alice = generate_key_pair()
+    bob = generate_key_pair()
+
+    tx1 = Transaction.create([user_pk],
+                             [([alice.public_key], 3), ([user_pk], 2)],
+                             asset=None)\
+                     .sign([user_sk])
+    b.store_bulk_transactions([tx1])
+
+    inputs = tx1.to_inputs()
+    tx2 = Transaction.transfer([inputs[1]], [([user2_pk], 2)], tx1.id).sign([user_sk])
+    assert tx2.validate(b)
+
+    tx2_dict = tx2.to_dict()
+    fulfills = tx2_dict['inputs'][0]['fulfills']
+    tx2_dict['inputs'][0]['fulfills'] = {'output_index': fulfills['output_index'],
+                                         'transaction_id': fulfills['transaction_id']}
+
+    backend.query.store_transactions(b.connection, [tx2_dict])
+
+    tx3 = Transaction.transfer([inputs[1]], [([bob.public_key], 2)], tx1.id).sign([user_sk])
+
+    with pytest.raises(DoubleSpend):
+        tx3.validate(b)

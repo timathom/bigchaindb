@@ -91,8 +91,11 @@ def get_assets(conn, asset_ids):
 
 @register_query(LocalMongoDBConnection)
 def get_spent(conn, transaction_id, output):
-    query = {'inputs.fulfills': {'transaction_id': transaction_id,
-                                 'output_index': output}}
+    query = {'inputs':
+             {'$elemMatch':
+              {'$and': [{'fulfills.transaction_id': transaction_id},
+                        {'fulfills.output_index': output}]}}}
+
     return conn.run(
         conn.collection('transactions')
             .find(query, {'_id': 0}))
@@ -180,15 +183,18 @@ def get_owned_ids(conn, owner):
 
 @register_query(LocalMongoDBConnection)
 def get_spending_transactions(conn, inputs):
+    transaction_ids = [i['transaction_id'] for i in inputs]
+    output_indexes = [i['output_index'] for i in inputs]
+    query = {'inputs':
+             {'$elemMatch':
+              {'$and':
+               [
+                   {'fulfills.transaction_id': {'$in': transaction_ids}},
+                   {'fulfills.output_index': {'$in': output_indexes}}
+               ]}}}
+
     cursor = conn.run(
-        conn.collection('transactions').aggregate([
-            {'$match': {
-                'inputs.fulfills': {
-                    '$in': inputs,
-                },
-            }},
-            {'$project': {'_id': False}}
-        ]))
+        conn.collection('transactions').find(query, {'_id': False}))
     return cursor
 
 
@@ -255,18 +261,15 @@ def get_unspent_outputs(conn, *, query=None):
 
 @register_query(LocalMongoDBConnection)
 def store_pre_commit_state(conn, state):
-    commit_id = state['commit_id']
     return conn.run(
         conn.collection('pre_commit')
-        .replace_one({'commit_id': commit_id}, state, upsert=True)
+        .replace_one({}, state, upsert=True)
     )
 
 
 @register_query(LocalMongoDBConnection)
-def get_pre_commit_state(conn, commit_id):
-    return conn.run(conn.collection('pre_commit')
-                    .find_one({'commit_id': commit_id},
-                              projection={'_id': False}))
+def get_pre_commit_state(conn):
+    return conn.run(conn.collection('pre_commit').find_one())
 
 
 @register_query(LocalMongoDBConnection)
@@ -282,13 +285,37 @@ def store_validator_set(conn, validators_update):
 
 
 @register_query(LocalMongoDBConnection)
-def store_election_results(conn, election):
+def delete_validator_set(conn, height):
+    return conn.run(
+        conn.collection('validators').delete_many({'height': height})
+    )
+
+
+@register_query(LocalMongoDBConnection)
+def store_election(conn, election_id, height, is_concluded):
     return conn.run(
         conn.collection('elections').replace_one(
-            {'election_id': election['election_id']},
-            election,
+            {'election_id': election_id,
+             'height': height},
+            {'election_id': election_id,
+             'height': height,
+             'is_concluded': is_concluded},
             upsert=True,
         )
+    )
+
+
+@register_query(LocalMongoDBConnection)
+def store_elections(conn, elections):
+    return conn.run(
+        conn.collection('elections').insert_many(elections)
+    )
+
+
+@register_query(LocalMongoDBConnection)
+def delete_elections(conn, height):
+    return conn.run(
+        conn.collection('elections').delete_many({'height': height})
     )
 
 
@@ -312,12 +339,11 @@ def get_validator_set(conn, height=None):
 def get_election(conn, election_id):
     query = {'election_id': election_id}
 
-    cursor = conn.run(
+    return conn.run(
         conn.collection('elections')
-        .find(query, projection={'_id': False})
+        .find_one(query, projection={'_id': False},
+                  sort=[('height', DESCENDING)])
     )
-
-    return next(cursor, None)
 
 
 @register_query(LocalMongoDBConnection)
@@ -342,6 +368,13 @@ def store_abci_chain(conn, height, chain_id, is_synced=True):
              'is_synced': is_synced},
             upsert=True,
         )
+    )
+
+
+@register_query(LocalMongoDBConnection)
+def delete_abci_chain(conn, height):
+    return conn.run(
+        conn.collection('abci_chains').delete_many({'height': height})
     )
 
 

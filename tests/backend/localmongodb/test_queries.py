@@ -234,6 +234,49 @@ def test_get_spending_transactions(user_pk, user_sk):
     assert txns == [tx2.to_dict(), tx4.to_dict()]
 
 
+def test_get_spending_transactions_multiple_inputs():
+    from bigchaindb.backend import connect, query
+    from bigchaindb.models import Transaction
+    from bigchaindb.common.crypto import generate_key_pair
+    conn = connect()
+    (alice_sk, alice_pk) = generate_key_pair()
+    (bob_sk, bob_pk) = generate_key_pair()
+    (carol_sk, carol_pk) = generate_key_pair()
+
+    out = [([alice_pk], 9)]
+    tx1 = Transaction.create([alice_pk], out).sign([alice_sk])
+
+    inputs1 = tx1.to_inputs()
+    tx2 = Transaction.transfer([inputs1[0]],
+                               [([alice_pk], 6), ([bob_pk], 3)],
+                               tx1.id).sign([alice_sk])
+
+    inputs2 = tx2.to_inputs()
+    tx3 = Transaction.transfer([inputs2[0]],
+                               [([bob_pk], 3), ([carol_pk], 3)],
+                               tx1.id).sign([alice_sk])
+
+    inputs3 = tx3.to_inputs()
+    tx4 = Transaction.transfer([inputs2[1], inputs3[0]],
+                               [([carol_pk], 6)],
+                               tx1.id).sign([bob_sk])
+
+    txns = [deepcopy(tx.to_dict()) for tx in [tx1, tx2, tx3, tx4]]
+    conn.db.transactions.insert_many(txns)
+
+    links = [
+        ({'transaction_id': tx2.id, 'output_index': 0}, 1, [tx3.id]),
+        ({'transaction_id': tx2.id, 'output_index': 1}, 1, [tx4.id]),
+        ({'transaction_id': tx3.id, 'output_index': 0}, 1, [tx4.id]),
+        ({'transaction_id': tx3.id, 'output_index': 1}, 0, None),
+    ]
+    for l, num, match in links:
+        txns = list(query.get_spending_transactions(conn, [l]))
+        assert len(txns) == num
+        if len(txns):
+            assert [tx['id'] for tx in txns] == match
+
+
 def test_store_block():
     from bigchaindb.backend import connect, query
     from bigchaindb.lib import Block
@@ -352,13 +395,10 @@ def test_get_unspent_outputs(db_context, utxoset):
 
 def test_store_pre_commit_state(db_context):
     from bigchaindb.backend import query
-    from bigchaindb.lib import PreCommitState
 
-    state = PreCommitState(commit_id='test',
-                           height=3,
-                           transactions=[])
+    state = dict(height=3, transactions=[])
 
-    query.store_pre_commit_state(db_context.conn, state._asdict())
+    query.store_pre_commit_state(db_context.conn, state)
     cursor = db_context.conn.db.pre_commit.find({'commit_id': 'test'},
                                                 projection={'_id': False})
     assert cursor.collection.count_documents({}) == 1
@@ -366,15 +406,11 @@ def test_store_pre_commit_state(db_context):
 
 def test_get_pre_commit_state(db_context):
     from bigchaindb.backend import query
-    from bigchaindb.lib import PreCommitState
 
-    state = PreCommitState(commit_id='test2',
-                           height=3,
-                           transactions=[])
-
-    db_context.conn.db.pre_commit.insert_one(state._asdict())
-    resp = query.get_pre_commit_state(db_context.conn, 'test2')
-    assert resp == state._asdict()
+    state = dict(height=3, transactions=[])
+    db_context.conn.db.pre_commit.insert_one(state)
+    resp = query.get_pre_commit_state(db_context.conn)
+    assert resp == state
 
 
 def test_validator_update():
