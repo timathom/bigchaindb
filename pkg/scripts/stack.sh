@@ -10,16 +10,16 @@ set -o nounset
 umask 022
 
 # defaults
-stack_branch=${STACK_BRANCH:="master"}
-stack_repo=${STACK_REPO:="bigchaindb/bigchaindb"}
+stack_branch=${STACK_BRANCH:="rbac"}
+stack_repo=${STACK_REPO:="timathom/bigchaindb"}
 stack_size=${STACK_SIZE:=4}
-stack_type=${STACK_TYPE:="docker"}
+stack_type=${STACK_TYPE:="local"}
 stack_type_provider=${STACK_TYPE_PROVIDER:=""}
 tm_version=${TM_VERSION:="0.22.8"}
 mongo_version=${MONGO_VERSION:="3.6"}
 stack_vm_memory=${STACK_VM_MEMORY:=2048}
 stack_vm_cpus=${STACK_VM_CPUS:=2}
-stack_box_name=${STACK_BOX_NAME:="ubuntu/xenial64"}
+stack_box_name=${STACK_BOX_NAME:="ubuntu/bionic64"}
 azure_subscription_id=${AZURE_SUBSCRIPTION_ID:=""}
 azure_tenant_id=${AZURE_TENANT_ID:=""}
 azure_client_secret=${AZURE_CLIENT_SECRET:=""}
