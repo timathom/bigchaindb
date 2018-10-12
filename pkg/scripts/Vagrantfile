@@ -78,7 +78,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       node.vm.synced_folder  "bigchaindb", "/opt/stack/bigchaindb" 
       # Add script to home dir     
       node.vm.provision :file do |file|
-        file.source="local/test.py"
+        file.source="bigchaindb/local/test.py"
         file.destination="/home/vagrant/test.py"
       end
       node.vm.hostname = instance
