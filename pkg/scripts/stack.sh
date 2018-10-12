@@ -19,7 +19,7 @@ tm_version=${TM_VERSION:="0.22.8"}
 mongo_version=${MONGO_VERSION:="3.6"}
 stack_vm_memory=${STACK_VM_MEMORY:=2048}
 stack_vm_cpus=${STACK_VM_CPUS:=2}
-stack_box_name=${STACK_BOX_NAME:="ubuntu/bionic64"}
+stack_box_name=${STACK_BOX_NAME:="ubuntu/xenial64"}
 azure_subscription_id=${AZURE_SUBSCRIPTION_ID:=""}
 azure_tenant_id=${AZURE_TENANT_ID:=""}
 azure_client_secret=${AZURE_CLIENT_SECRET:=""}
