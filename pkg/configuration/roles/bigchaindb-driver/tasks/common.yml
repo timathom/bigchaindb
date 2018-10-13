@@ -21,10 +21,6 @@
   shell: "pip3 install base58"
   tags: [bigchaindb-driver]
 
-- name: Install json
-  shell: "pip3 install json"
-  tags: [bigchaindb-driver]
-
 - name: Install sha3
   shell: "pip3 install sha3"
   tags: [bigchaindb-driver]
