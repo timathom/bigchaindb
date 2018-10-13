@@ -12,15 +12,3 @@
 - name: Install BigchainDB Driver
   shell: "pip3 install bigchaindb-driver"
   tags: [bigchaindb-driver]
-
-- name: Install Cryptoconditions
-  shell: "pip3 install cryptoconditions"
-  tags: [bigchaindb-driver]
-
-- name: Install base58
-  shell: "pip3 install base58"
-  tags: [bigchaindb-driver]
-
-- name: Install sha3
-  shell: "pip3 install sha3"
-  tags: [bigchaindb-driver]
