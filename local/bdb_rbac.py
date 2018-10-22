@@ -21,7 +21,7 @@ bf_item = {"data": {
 
 iul_bf_item_metadata = {
     "@context": {
-        "bf": "bf:",
+        "bf": "http://id.loc.gov/ontologies/bibframe/",
         "bflc": "http://id.loc.gov/ontologies/bflc/",
         "rdfs": "rdfs:"
     },
