@@ -13,8 +13,6 @@ class BigchainDB_RBAC():
         self.admin_keypair = admin_keypair    
         
     def create_new_asset(self, asset, metadata, keypair=None, multiple=False):
-        print(multiple)
-        print(keypair)
         if keypair == None:            
             keypair = self.admin_keypair        
         if multiple == False:
