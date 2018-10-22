@@ -211,9 +211,10 @@ stack_type_provider="$(echo $stack_type_provider | tr '[A-Z]' '[a-z]')"
 if [[ $stack_type == "local" ]]; then
 	echo "Configuring setup locally!"
 	vagrant up --provider virtualbox --provision
-	ansible-playbook $CONF_DIR/bigchaindb-start.yml \
-		-i $CONF_DIR/hosts/all \
-		--extra-vars "operation=start home_path=${TOP_DIR}"
+	# ansible-playbook $CONF_DIR/bigchaindb-start.yml \
+	#	-i $CONF_DIR/hosts/all \
+	#	--extra-vars "operation=start home_path=${TOP_DIR}"
+	# Make provisioning a separate task in Makefile, otherwise network doesn't deploy cleanly.
 elif [[ $stack_type == "cloud" && $stack_type_provider == "azure" ]]; then
     echo ${azure_tenant_id:?AZURE_TENANT_ID not set! Exiting. $(exit 1)}
     echo ${azure_client_secret:?AZURE_CLIENT_SECRET not set! Exiting. $(exit 1)}
