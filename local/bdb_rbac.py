@@ -17,7 +17,7 @@ from bigchaindb_driver import BigchainDB
 from bigchaindb_driver.crypto import generate_keypair
 from bigchaindb_rbac import BigchainDB_RBAC
 
-BDB_ROOT_URL = "https://test.bigchaindb.com"
+BDB_ROOT_URL = "http://localhost:9984"
 IUL = generate_keypair()
 
 bdb = BigchainDB(BDB_ROOT_URL)
@@ -55,6 +55,11 @@ iul_bf_item_metadata = {
             "@type": ["bf:Note"],
             "rdfs:label": [{"@value": "First book printed from movable types in Europe; New Testament only from v. 2,in itself imperfect. GKW 4201 (\"not after Aug. 1456\"). BMC I, p. 17; Lilly Library Publication V, no. 1 (this copy, described in extenso); Goff B-526. Removed in 1953 from copy of v. 2 known as Trier II, in censuses as De Ricci 15 [b], Schwenke 14, Lazare 42, Norman 34."}]
         },
+#        {
+#            "@id": "_:N981e348f02414549b1f45d3c4fd27c9f",
+#            "@type": ["http://id.loc.gov/ontologies/bibframe/Note"],
+#            "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "First book printed from movable types in Europe; New Testament only from v. 2,in itself imperfect. GKW 4201 (\"not after Aug. 1456\"). BMC I, p. 17; Lilly Library Publication V, no. 1 (this copy, described in extenso); Goff B-526. Removed in 1953 from copy of v. 2 known as Trier II, in censuses as De Ricci 15 [b], Schwenke 14, Lazare 42, Norman 34."}]
+#        },
         {
             "@id": "_:N86583b665c5a48bea6e69601f242ca82",
             "@type": ["bf:ShelfMarkLcc"],
@@ -110,7 +115,7 @@ def main():
                                                iul_cataloger, 
                                                (iul_cataloger.public_key, 
                                                 IUL.public_key)) 
-        print("Sample IUL Item: ", sample_iul_item["id"])
+        print("Sample IUL Item: ", sample_iul_item)
     except Exception as e:
         print(e)
         

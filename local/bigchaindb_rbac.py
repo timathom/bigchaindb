@@ -34,7 +34,7 @@ class BigchainDB_RBAC():
             tx = self.conn.transactions.prepare(
                     operation="CREATE",
                     signers=keypair.public_key,
-                    recipients=tuple(multiple),
+                    recipients=multiple,
                     asset=asset,
                     metadata=metadata)
         signed_tx = self.conn.transactions.fulfill(
