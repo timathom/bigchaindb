@@ -23,7 +23,7 @@ iul_bf_item_metadata = {
     "@context": {
         "bf": "http://id.loc.gov/ontologies/bibframe/",
         "bflc": "http://id.loc.gov/ontologies/bflc/",
-        "rdfs": "rdfs:"
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
     },
     "@graph": [
         {
