@@ -1,25 +1,57 @@
+.DS_*
+_*
+.#*
+*.html
+*.class
+*.iso
+*.rpm
+*.class
+*.exe
+*.o
+.idea
+
+*-dot2tex-*
+# LATEX FILES
+single_tb.tex
+dest
+*.tdo
+*.fls
+*.markdown.*
+# LaTeX
+*.dvi
+*.out
+*.synctex.*
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.idx
+*.ilg
+*.ind
+*.ptc
+*.run.xml
+*.toc
+*.log
+*.fdb_latexmk
+*.fls
+*.tdo
+*.listing
+*.lof
+*.cb
+*.cb2
+*.lb
+*--
+
+.idea
 # Byte-compiled / optimized / DLL files
+/_book/
 __pycache__/
 *.py[cod]
 *$py.class
+dist
 
 # C extensions
 *.so
-
-# Swap -- copypasta from https://github.com/github/gitignore/blob/master/Global/Vim.gitignore
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
-
-# Session
-Session.vim
-
-# Temporary
-.netrwhist
-*~
-# Auto-generated tag files
-tags
 
 # Distribution / packaging
 .Python
@@ -55,10 +87,9 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-.pytest_cache/
 nosetests.xml
 coverage.xml
-*.cover
+*,cover
 .hypothesis/
 
 # Translations
@@ -67,31 +98,22 @@ coverage.xml
 
 # Django stuff:
 *.log
-local_settings.py
 
 # Sphinx documentation
-docs/build/
+docs/_build/
 
 # PyBuilder
 target/
 
-# Ipython Notebook
+#Ipython Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
+# Editor
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
 
-# Just in time documentation
-docs/server/source/http-samples
+paper/report.pdf
 
-# Terraform state files
-# See https://stackoverflow.com/a/41482391
-terraform.tfstate
-terraform.tfstate.backup
 
-# tendermint data
-tmdata/data
-network/*/data
-
-# Docs that are fetched at build time
-docs/contributing/source/cross-project-policies/*.md
